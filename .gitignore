@@ -1,0 +1,8 @@
+
+*.xml
+
+*.cmake
+
+socket/src/cmake-build-debug/
+
+*.iml

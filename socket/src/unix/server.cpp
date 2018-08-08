@@ -10,36 +10,32 @@
 
 #define MYPORT 8080
 #define BACKLOG 10 /*多少等待连接控制*/
+#define MAXDATASIZE 100 /* 每次可以接收的最大字节 */
 
 using namespace std;
 
 
 int serverTest() {
     cout << "server" << endl;
-    int sockfd, new_fd;
+    int sockfd, new_fd, numbytes;
     unsigned int sin_size;
+    char buf[MAXDATASIZE];
     struct sockaddr_in my_addr;
     struct sockaddr_in their_addr; /* connector's address information */
 
     sockfd = ::socket(AF_INET, SOCK_STREAM, 0); /*需要错误检查 */
-//    printf("%d\n", sockfd);
-    my_addr.sin_family = AF_INET; /* host byte order */
-
-    my_addr.sin_port = htons(MYPORT); /* short, network byte order */
-
+    //htons()作用是将端口号由主机字节序转换为网络字节序的整数值。(host to net)
+    //inet_addr()作用是将一个IP字符串转化为一个网络字节序的整数值，用于sockaddr_in.sin_addr.s_addr。
+    //inet_ntoa()作用是将一个sin_addr结构体输出成IP字符串(network to ascii)
+    my_addr.sin_family = AF_INET;
+    my_addr.sin_port = htons(MYPORT);
     my_addr.sin_addr.s_addr = inet_addr("192.168.1.166");
-//    printf("%s\n", inet_ntoa(my_addr.sin_addr));
+    printf("%s\n", inet_ntoa(my_addr.sin_addr));
+    bzero(&(my_addr.sin_zero), 8);
 
-    bzero(&(my_addr.sin_zero), 8); /* zero the rest of the struct */
-
-//    int bindResult = ::bind(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr));
-//    cout << bindResult << endl;
-//
-//    int connectResult = connect(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr));
-//    cout << connectResult << endl;
     if (::bind(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr))== -1) {
         perror("bind");
-        cout << "bind erroe" << endl;
+        cout << "bind error" << endl;
         exit(1);
     }
 
@@ -48,16 +44,23 @@ int serverTest() {
         exit(1);
     }
 
-    while(1) { /* main accept() loop */
+    while(1) {
         sin_size = sizeof(struct sockaddr_in);
         if ((new_fd = ::accept(sockfd, (struct sockaddr *)&their_addr, &sin_size)) == -1) {
             perror("accept");
             continue;
         }
-        printf("server: got connection from %s\n", \
-        inet_ntoa(their_addr.sin_addr));
-        if (!fork()) { /* this is the child process */
-            if (send(new_fd, "Hello, world!\n", 14, 0) == -1)
+        printf("server: got connection from %s\n", inet_ntoa(their_addr.sin_addr));
+        if (0==fork()) {
+            if ((numbytes=recv(new_fd, buf, MAXDATASIZE, 0)) == -1) {
+                perror("recv");
+                exit(1);
+            }
+            buf[numbytes] = '\0';
+            printf("Received: %s",buf);
+        }
+        if (0==fork()) { /* this is the child process */
+            if (send(new_fd, "Hello, i am server!\n", 100, 0) == -1)
                 perror("send");
             close(new_fd);
             exit(0);

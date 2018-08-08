@@ -12,6 +12,7 @@
 #include <sys/wait.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 
 #define PORT 8080 /* 客户机连接远程主机的端口 */
 #define MAXDATASIZE 100 /* 每次可以接收的最大字节 */
@@ -41,12 +42,16 @@ int clientTest(int argc, char *argv[]) {
     }
     their_addr.sin_family = AF_INET; /* host byte order */
     their_addr.sin_port = htons(PORT); /* short, network byte order */
-    their_addr.sin_addr = *((struct in_addr *)he->h_addr);
+    their_addr.sin_addr = *((struct in_addr *)(he->h_addr));
+//    their_addr.sin_addr.s_addr = inet_addr("192.168.1.166");
     bzero(&(their_addr.sin_zero), 8); /* zero the rest of the struct */
     if(connect(sockfd,(struct sockaddr *)&their_addr,sizeof(struct sockaddr)) == -1) {
         perror("connect");
         exit(1);
     }
+    if (send(sockfd, "Hello, i am client!\n", 100, 0) == -1)
+        perror("send");
+
     if ((numbytes=recv(sockfd, buf, MAXDATASIZE, 0)) == -1) {
         perror("recv");
         exit(1);

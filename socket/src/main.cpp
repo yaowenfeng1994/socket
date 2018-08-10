@@ -5,6 +5,7 @@
 #include <curses.h>
 #include <stdio.h>
 #include "unix/define.h"
+#include "unix/epoll/epoll_server.cpp"
 
 using namespace std;
 
@@ -13,8 +14,9 @@ int main() {
     cout << "Hello, World!" << "\n" << "skr skr";
     return 0;
 #endif
-#if 0
-    serverTest();
+#if 1
+//    serverTest();
+    pollServer();
 #endif
 #if 0
     char argv[]="192.158.1.166";//字符串0
@@ -22,7 +24,7 @@ int main() {
     char *pArgv[]={argv};
     clientTest(2, pArgv);
 #endif
-#if 1
+#if 0
     InitChatWindow();
     input();
 #endif

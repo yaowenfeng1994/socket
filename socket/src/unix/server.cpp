@@ -51,14 +51,14 @@ int serverTest() {
             continue;
         }
         printf("server: got connection from %s\n", inet_ntoa(their_addr.sin_addr));
-        if (0==fork()) {
-            if ((numbytes=recv(new_fd, buf, MAXDATASIZE, 0)) == -1) {
-                perror("recv");
-                exit(1);
-            }
-            buf[numbytes] = '\0';
-            printf("Received: %s",buf);
-        }
+//        if (0==fork()) {
+//            if ((numbytes=recv(new_fd, buf, MAXDATASIZE, 0)) == -1) {
+//                perror("recv");
+//                exit(1);
+//            }
+//            buf[numbytes] = '\0';
+//            printf("Received: %s",buf);
+//        }
         if (0==fork()) { /* this is the child process */
             if (send(new_fd, "Hello, i am server!\n", 100, 0) == -1)
                 perror("send");

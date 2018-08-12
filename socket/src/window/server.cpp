@@ -1,7 +1,10 @@
-// Created by å§šæ–‡é”‹ on 2018/8/4.
+// Created by Ò¦ÎÄ·æ on 2018/8/4.
 //
 #include "utility.h"
 using namespace std;
+
+// DWORD WINAPI ThreadProc(LPVOID lpParameter);
+DWORD WINAPI threadClient(LPVOID lpParameter);
 
 int serverTest() {
     WSADATA wsaData;
@@ -41,6 +44,12 @@ int serverTest() {
 
     int time = 1;
     while (1) {
+        // µÚÒ»¸ö²ÎÊý£¬Ê¹ÓÃÄ¬ÈÏµÄ°²È«ÐÔ£»µÚ¶þ¸ö²ÎÊý£¬Ê¹ÓÃÓëµ÷ÓÃº¯ÊýµÄÏß³ÌÏàÍ¬µÄÕ»´óÐ¡
+        // µÚÈý¸ö²ÎÊý£¬Ïß³Ìº¯ÊýÈë¿Ú£»µÚËÄ¸ö²ÎÊý£¬´«µÝ¸øÏß³ÌµÄ²ÎÊý
+        // µÚÎå¸ö²ÎÊý£¬Ïß³Ì´´½¨ºó£¬Á¢¼´ÔËÐÐ£¬µÚÁù¸ö²ÎÊý£¬ÐÂÏß³ÌµÄID
+        // int threadTime = time;
+        // HANDLE hThread1 = CreateThread(NULL, 0, ThreadProc, &threadTime, 0, NULL);
+
         int len = sizeof(struct sockaddr);
         SOCKET clientSocket = accept(listenerSocket, (struct sockaddr *) &clientAddress, &len);
         if (clientSocket == INVALID_SOCKET) {
@@ -49,13 +58,78 @@ int serverTest() {
             return 0;
         }
         printf("server: got connection from %s\n", inet_ntoa(clientAddress.sin_addr));
-
-        char buf[1024] = "\0";
-        int buflen = recv(clientSocket, buf, BUF_SIZE, 0);
-        if (buflen == SOCKET_ERROR) {
-            perror("recv fail");
-            return 0;
+        if (clientSocket > 0)
+        {
+            SOCKET *newClientSocket = new SOCKET(clientSocket);
+            cout << "clientSocket1: " << *newClientSocket << endl;
+            // 1.Ïß³ÌºÍÏß³Ì¾ä±ú£¨Handle£©²»ÊÇÒ»¸ö¶«Î÷£¬Ïß³ÌÊÇÔÚcpuÉÏÔËÐÐµÄ.....£¨Ëµ²»Çå³þÁË£©£¬Ïß³Ì¾ä±úÊÇÒ»¸öÄÚºË¶ÔÏó¡£
+            // ÎÒÃÇ¿ÉÒÔÍ¨¹ý¾ä±úÀ´²Ù×÷Ïß³Ì£¬µ«ÊÇÏß³ÌµÄÉúÃüÖÜÆÚºÍÏß³Ì¾ä±úµÄÉúÃüÖÜÆÚ²»Ò»ÑùµÄ¡£
+            // Ïß³ÌµÄÉúÃüÖÜÆÚ¾ÍÊÇÏß³Ìº¯Êý´Ó¿ªÊ¼Ö´ÐÐµ½return£¬Ïß³Ì¾ä±úµÄÉúÃüÖÜÆÚÊÇ´ÓCreateThread·µ»Øµ½ÄãCloseHandle()¡£
+            // 2.ËùÓÐµÄÄÚºË¶ÔÏó£¨°üÀ¨Ïß³ÌHandle£©¶¼ÊÇÏµÍ³×ÊÔ´£¬ÓÃÁËÒª»¹µÄ£¬Ò²¾ÍÊÇËµÓÃÍêºóÒ»¶¨Òªclosehandle¹Ø±ÕÖ®£¬
+            // Èç¹û²»ÕâÃ´×ö£¬ÄãÏµÍ³µÄ¾ä±ú×ÊÔ´ºÜ¿ì¾ÍÓÃ¹âÁË¡£
+            // 3.Èç¹ûÄãCreateThreadÒÔºóÐèÒª¶ÔÕâ¸öÏß³Ì×öÒ»Ð©²Ù×÷£¬±ÈÈç¸Ä±äÓÅÏÈ¼¶£¬±»ÆäËûÏß³ÌµÈ´ý£¬Ç¿ÖÆTermateThreadµÈ£¬
+            // ¾ÍÒª±£´æÕâ¸ö¾ä±ú£¬Ê¹ÓÃÍêÁËÔÚCloseHandle¡£Èç¹ûÄã¿ªÁËÒ»¸öÏß³Ì£¬¶ø²»ÐèÒª¶ÔËü½øÐÐÈçºÎ¸ÉÔ¤£¬
+            // CreateThreadºóÖ±½ÓCloseHandle¾ÍÐÐÁË¡£ËùÒÔ CloseHandel(ThreadHandle )£¬Ö»ÊÇ¹Ø±ÕÁËÒ»¸öÏß³Ì¾ä±ú¶ÔÏó£¬
+            // ±íÊ¾ÎÒ²»ÔÙÊ¹ÓÃ¸Ã¾ä±ú£¬¼´²»¶ÔÕâ¸ö¾ä±ú¶ÔÓ¦µÄÏß³Ì×öÈÎºÎ¸ÉÔ¤ÁË¡£²¢Ã»ÓÐ½áÊøÏß³Ì¡£
+            HANDLE hThread1 = CreateThread(NULL, 0, threadClient, newClientSocket, 0, NULL);
+            CloseHandle(hThread1);
         }
-        cout << "recieve data" << time++ << ": " << buf << endl;
+
+//        char buf[1024] = "\0";
+//        int bufLen = recv(clientSocket, buf, BUF_SIZE, 0);
+//        if (bufLen == SOCKET_ERROR) {
+//            perror("recieve fail");
+//            return 0;
+//        }
+//        cout << "server recieve data" << time++ << ": " << buf << endl;
+//
+//        char sendBuf[1024] = "\b·þÎñ¶ËÊÕµ½ÁËÄã¸Õ¸Õ·¢µÄÏûÏ¢\0";
+//        cout << sendBuf << endl;
+//        iResult = send(clientSocket, sendBuf, strlen(sendBuf), 0);
+//        if (iResult == SOCKET_ERROR)
+//        {
+//            perror("send fail");
+//            exit(1);
+//        }
     }
+}
+
+//DWORD WINAPI ThreadProc(LPVOID lpParameter)
+//{
+//    int *p = (int*)lpParameter;
+//    while(1)
+//    {
+//        cout << "×ÓÏß³ÌÑ­»·ÖÐ" <<(*p)-- << endl;
+//        if (*p < 0)
+//        {
+//            cout << "×ÓÏß³ÌÍÆ³ö"<< endl;
+//            break;
+//        }
+//        Sleep(1000);
+//    }
+//    return 0;
+//}
+
+DWORD WINAPI threadClient(LPVOID lpParameter)
+{
+    char buf[1024] = "\0";
+    int err;
+    SOCKET *p = (SOCKET*)lpParameter;
+    cout << "clientSocket2: " << *p << endl;
+    int bufLen = recv(*p, buf, BUF_SIZE, 0);
+    if (bufLen == SOCKET_ERROR) {
+        perror("recieve fail");
+        return 0;
+    }
+    cout << "server recieve data: " << buf << endl;
+
+    char sendBuf[1024] = "\b·þÎñ¶ËÊÕµ½ÁËÄã¸Õ¸Õ·¢µÄÏûÏ¢\0";
+    err = send(*p, sendBuf, strlen(sendBuf), 0);
+    if (err == SOCKET_ERROR)
+    {
+        perror("send fail");
+        exit(1);
+    }
+    delete lpParameter;
+    return 0;
 }

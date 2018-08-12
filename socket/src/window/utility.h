@@ -5,6 +5,7 @@
 #ifndef SOCKET_UTILITY_H
 #define SOCKET_UTILITY_H
 #include <string>
+#include <cstring>
 #include <winsock.h>
 #include <iostream>
 

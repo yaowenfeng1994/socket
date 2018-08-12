@@ -9,4 +9,4 @@ set(CMAKE_CXX_STANDARD 17)
 
 # window
 link_libraries(wsock32)
-add_executable(socket1 main.cpp window/server.cpp window/client.cpp)
+add_executable(socket2 main.cpp window/server.cpp window/client.cpp)

@@ -41,5 +41,13 @@ int clientTest() {
         perror("send fail");
         exit(1);
     }
+
+    char recvBuf[1024] = "\0";
+    int bufLen = recv(connectSocket, recvBuf, BUF_SIZE, 0);
+    if (bufLen == SOCKET_ERROR) {
+        perror("recieve fail");
+        return 0;
+    }
+    cout << "client recieve data: " << recvBuf << endl;
     return 0;
 }

@@ -29,13 +29,18 @@ int pollServer() {
         perror("listenerSocket listen fail");
         exit(1);
     }
-    //在内核中创建事件表
-    int epfd = epoll_create(EPOLL_SIZE);
-    if(epfd < 0) { perror("epfd error"); exit(-1);}
-    printf("epoll created, epollfd = %d\n", epfd);
-    static struct epoll_event events[EPOLL_SIZE];
+    kqueue();
+    //创建kqueue
+    int epollfd = kqueue();
+    if(epollfd < 0)
+    {
+        perror("epollfd error");
+        exit(-1);
+    }
+    printf("epoll created, epollfd = %d\n", epollfd);
+    struct kevent events[EPOLL_SIZE];
+//    static struct epoll_event events[EPOLL_SIZE];
     //往内核事件表里添加事件
     addfd(epfd, listenerSocket, true);
-
     return 0;
 }

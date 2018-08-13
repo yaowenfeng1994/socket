@@ -1,7 +1,7 @@
 //
 // Created by 姚文锋 on 2018/8/7.
 //
-#if 0
+#if 1
 #include <iostream>
 #include <curses.h>
 #include <stdio.h>
@@ -12,7 +12,7 @@ using namespace std;
 
 int main() {
 
-#if 0
+#if 1
 //    serverTest();
     pollServer();
 #endif
@@ -29,7 +29,7 @@ int main() {
 }
 #endif
 
-#if 1
+#if 0
 #include "window/utility.h"
 
 int main() {

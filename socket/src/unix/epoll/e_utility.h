@@ -2,8 +2,8 @@
 // Created by 姚文锋 on 2018/8/10.
 //
 
-#ifndef SOCKET_UTILITY_H
-#define SOCKET_UTILITY_H
+#ifndef SOCKET_E_UTILITY_H
+#define SOCKET_E_UTILITY_H
 #include <iostream>
 #include <sys/socket.h>
 #include <arpa/inet.h>

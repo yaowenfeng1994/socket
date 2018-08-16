@@ -1,7 +1,7 @@
 //
 // Created by 姚文锋 on 2018/8/10.
 //
-#include "utility.h"
+#include "e_utility.h"
 
 using namespace std;
 
@@ -38,9 +38,19 @@ int pollServer() {
         exit(-1);
     }
     printf("epoll created, epollfd = %d\n", epollfd);
-    struct kevent events[EPOLL_SIZE];
+
+/*    struct kevent {                                                                           */
+/*        uintptr_t	ident;		    比如该事件关联的文件描述符                                      */
+/*        int16_t		filter;	    可以指定监听类型,如EVFILT_READ,EVFILT_WRITE,EVFILT_TIMER等     */
+/*        uint16_t	flags;		    可以指定事件操作类型,比如EV_ADD,EV_ENABLE, EV_DELETE等          */
+/*        uint32_t	fflags;		                                                                */
+/*        intptr_t	data;		                                                                */
+/*        void		*udata;		    可以携带的任意数据                                             */
+/*    };                                                                                        */
+
+    struct kevent events;
 //    static struct epoll_event events[EPOLL_SIZE];
     //往内核事件表里添加事件
-    addfd(epfd, listenerSocket, true);
+//    addfd(epollfd, listenerSocket, true);
     return 0;
 }

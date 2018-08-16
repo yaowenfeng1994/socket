@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "unix/define.h"
 #include "unix/epoll/epoll_server.cpp"
+#include "unix/select_poll/sp_utility.h"
 
 using namespace std;
 
@@ -14,13 +15,12 @@ int main() {
 
 #if 1
 //    serverTest();
-    pollServer();
+//    pollServer();
+    selectPollServer();
 #endif
 #if 0
-    char argv[]="192.158.1.166";//字符串0
-//    char argv1[]="123";//字符串1
-    char *pArgv[]={argv};
-    clientTest(2, pArgv);
+//   clientTest();
+    selectPollClient();
 #endif
 #if 0
     InitChatWindow();

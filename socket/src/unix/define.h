@@ -13,7 +13,7 @@
 #include <netdb.h>
 
 
-#define PORT 8082
+#define PORT 8088
 #define BACKLOG 10 /*多少等待连接控制*/
 #define MAXDATASIZE 100 /* 每次可以接收的最大字节 */
 

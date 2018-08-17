@@ -9,7 +9,10 @@ int selectPollServer() {
     cout << "server" << endl;
     struct sockaddr_in server_addr;
     struct sockaddr_in client_addr;
+
     int sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
+    int new_fd, numbytes;
+    unsigned int sin_size;
     int max_fd = sockfd;
     char buf[1024]={0};
     vector<int>	 connFds;
@@ -30,30 +33,51 @@ int selectPollServer() {
         exit(1);
     }
 
-    socklen_t client_addr_len = sizeof(client_addr);
+//    socklen_t client_addr_len = sizeof(client_addr);
 
     //文件描述符集合
     fd_set read_fds;
-    fd_set exception_fds;
+//    fd_set exception_fds;
     FD_ZERO(&read_fds);
-    FD_ZERO(&exception_fds);
+//    FD_ZERO(&exception_fds);
     timeval tv;
 
     while(1)
     {
-        cout << max_fd << endl;
         FD_SET(sockfd,&read_fds);
         tv.tv_sec = 2;//这里我们打算让select等待两秒后返回，避免被锁死，也避免马上返回
         tv.tv_usec = 0;
 
-        for(int i =0;i<connFds.size();++i)
+        /*for(int i =0;i<connFds.size();++i)
         {
             FD_SET(connFds[i],&read_fds);
             FD_SET(connFds[i],&exception_fds);
-        }
-        int ret = select(max_fd+1, &read_fds, NULL, &exception_fds, &tv);
+        }*/
+        select(max_fd+1, &read_fds, NULL, NULL, &tv);
 
-        cout << ret << endl;
+        if (FD_ISSET(sockfd, &read_fds))
+        {
+                sin_size = sizeof(struct sockaddr_in);
+                if ((new_fd = ::accept(sockfd, (struct sockaddr *)&client_addr, &sin_size)) == -1)
+                {
+                    perror("accept");
+                    continue;
+                }
+                printf("server: got connection from %s\n", inet_ntoa(client_addr.sin_addr));
+                if (0==fork()) {
+                    if ((numbytes=recv(new_fd, buf, MAXDATASIZE, 0)) == -1) {
+                        perror("recv");
+                        exit(1);
+                    }
+                    buf[numbytes] = '\0';
+                    printf("Received: %s",buf);
+                }
+        }
+        else
+        {
+            cout << "还没有连接进来" << endl;
+        }
+/*        cout << ret << endl;
         if( ret  ==  -1)
         {
             perror("select");
@@ -63,7 +87,7 @@ int selectPollServer() {
         {
             perror("timeout");
             break;
-        }
+        }*/
 
 /*        for(vector<int>::iterator it = connFds.begin();it != connFds.end();)
         {

@@ -13,12 +13,12 @@ using namespace std;
 
 int main() {
 
-#if 1
+#if 0
 //    serverTest();
 //    pollServer();
     selectPollServer();
 #endif
-#if 0
+#if 1
 //   clientTest();
     selectPollClient();
 #endif

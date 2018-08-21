@@ -17,6 +17,17 @@ int main() {
 //    serverTest();
 //    pollServer();
     selectPollServer();
+
+//    struct A {
+//        int eye;
+//    };
+//    A *a = new A;
+//    a->eye = 1;
+//    delete a;
+//    cout << a->eye << endl;
+//    int *a = new int(1);
+//    delete a;
+//    cout << *a << endl;
 #endif
 #if 1
 //   clientTest();

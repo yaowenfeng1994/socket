@@ -15,7 +15,7 @@
 #include <sys/poll.h>
 #define PORT 8088
 #define BACKLOG 2
-#define MAXDATASIZE 100 /* 每次可以接收的最大字节 */
+#define MAX_DATA_SIZE 100 /* 每次可以接收的最大字节 */
 
 extern int selectPollServer();
 extern int selectPollClient();

@@ -3,8 +3,6 @@
 //
 #include "sp_utility.h"
 
-using namespace std;
-
 int selectPollServer() {
     cout << "server" << endl;
     struct sockaddr_in server_addr;
@@ -15,8 +13,8 @@ int selectPollServer() {
     unsigned int sin_size;
     int max_fd = sockfd;
     char buf[MAX_DATA_SIZE];
-    vector<int>	 connFds;
-    connFds.reserve(BACKLOG);
+    vector<clientSocketFd> connFds;
+//    connFds.reserve(BACKLOG);
 
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(PORT);
@@ -49,54 +47,59 @@ int selectPollServer() {
         tv.tv_usec = 0;
         for(int i =0;i<connFds.size();++i)
         {
-            FD_SET(connFds[i],&read_fds);
-            FD_SET(connFds[i],&exception_fds);
-            cout << connFds[i] << endl;
+            FD_SET(connFds[i].socketFd,&read_fds);
+            FD_SET(connFds[i].socketFd,&exception_fds);
+            cout << connFds[i].socketFd << endl;
         }
-        select(max_fd+1, &read_fds, NULL, &exception_fds, NULL);
-        for (vector<int>::iterator it=connFds.begin();it != connFds.end();)
+        select(max_fd+1, &read_fds, NULL, &exception_fds, &tv);
+        for (vector<clientSocketFd>::iterator it=connFds.begin();it != connFds.end();)
         {
-            if (FD_ISSET(*it, &read_fds))
+            if (FD_ISSET(it->socketFd, &read_fds))
             {
                 bzero(buf,sizeof(buf));
-                if ((numbytes=recv(*it, buf, MAX_DATA_SIZE, 0)) == -1)
+                if ((numbytes=recv(it->socketFd, buf, MAX_DATA_SIZE, 0)) == -1)
                 {
                     perror("recv");
-                    close(*it);
-                    FD_CLR(*it,&read_fds);
+                    close(it->socketFd);
+                    FD_CLR(it->socketFd,&read_fds);
                     it = connFds.erase(it);
                     continue;
                 }
                 else
                 {
-                    buf[numbytes] = '\0';
-                    printf("Received: %s",buf);
                     sleep(1);
-                    for(int i =0;i<connFds.size();++i)
+                    buf[numbytes] = '\0';
+                    printf("Received: %s\n",buf);
+                    if (strcmp(buf, "close") == 0)
                     {
-                        if(connFds[i] != *it)
+                        cout << "这里要删除conn里一个连接" << endl;
+                    } else {
+                        for(int i =0;i<connFds.size();++i)
                         {
-                            string str("some one said:");
-                            str.append(buf);
-                            int ret = send(*it,str.c_str(),str.length(),0);
-                            if(ret<=0)
+                            if(connFds[i].socketFd != it->socketFd)
                             {
-                                perror("send");
+                                string str("some one said:");
+                                str.append(buf);
+                                int ret = send(it->socketFd,str.c_str(),str.length(),0);
+                                if(ret<=0)
+                                {
+                                    perror("send");
+                                }
                             }
-                        }
 
+                        }
                     }
                 }
             }
             ++it;
         }
 
-        for(vector<int>::iterator it = connFds.begin();it != connFds.end();++it)
+        for(vector<clientSocketFd>::iterator it = connFds.begin();it != connFds.end();++it)
         {
-            if(FD_ISSET(*it, &exception_fds))
+            if(FD_ISSET(it->socketFd, &exception_fds))
             {
                 bzero(buf, sizeof(buf));
-                int ret = recv(*it, buf, MAX_DATA_SIZE, MSG_OOB);
+                int ret = recv(it->socketFd, buf, MAX_DATA_SIZE, MSG_OOB);
                 if(ret < 0)
                 {
                     perror("exception");
@@ -118,7 +121,9 @@ int selectPollServer() {
                 close(new_fd);
                 break;
             }
-            connFds.push_back(new_fd);
+            clientSocketFd fdObj;
+            fdObj.socketFd = new_fd;
+            connFds.push_back(fdObj);
             max_fd = new_fd;
             // inet_ntoa(struct addr_in) 将IP地址转换为字符串并返回
             // 只是从监听队列中取出连接，即使客户端已经断开网络连接也会accept成功

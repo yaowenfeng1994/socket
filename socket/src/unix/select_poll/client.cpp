@@ -28,5 +28,9 @@ int selectPollClient() {
     if (send(remote_sockfd, "Hello, i am client!\n", 100, 0) == -1)
         perror("send");
 
+    sleep(3);
+    if (send(remote_sockfd, "close\n", 100, 0) == -1)
+        perror("send");
+    close(remote_sockfd);
     return 0;
 }

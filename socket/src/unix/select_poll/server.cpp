@@ -18,7 +18,7 @@ int selectPollServer() {
 
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(PORT);
-    server_addr.sin_addr.s_addr = inet_addr("192.168.1.166");
+    server_addr.sin_addr.s_addr = inet_addr("192.168.0.102");
     bzero(&(server_addr.sin_zero), 8);
 
     if (::bind(sockfd, (struct sockaddr *)&server_addr, sizeof(struct sockaddr))== -1) {
@@ -40,7 +40,7 @@ int selectPollServer() {
     FD_ZERO(&exception_fds);
     timeval tv;
 
-    while(1)
+    while (true)
     {
         FD_SET(sockfd,&read_fds);
         tv.tv_sec = 2;//这里我们打算让select等待两秒后返回，避免被锁死，也避免马上返回
@@ -49,7 +49,7 @@ int selectPollServer() {
         {
             FD_SET(connFds[i].socketFd,&read_fds);
             FD_SET(connFds[i].socketFd,&exception_fds);
-            cout << connFds[i].socketFd << endl;
+            cout << "当前连接池里有：" << connFds[i].socketFd << endl;
         }
         select(max_fd+1, &read_fds, NULL, &exception_fds, &tv);
         for (vector<clientSocketFd>::iterator it=connFds.begin();it != connFds.end();)
@@ -57,23 +57,41 @@ int selectPollServer() {
             if (FD_ISSET(it->socketFd, &read_fds))
             {
                 bzero(buf,sizeof(buf));
-                if ((numbytes=recv(it->socketFd, buf, MAX_DATA_SIZE, 0)) == -1)
+                if (recv(it->socketFd, buf, MAX_DATA_SIZE, 0) == -1)
                 {
                     perror("recv");
                     close(it->socketFd);
                     FD_CLR(it->socketFd,&read_fds);
                     it = connFds.erase(it);
                     continue;
-                }
-                else
-                {
+                } else {
                     sleep(1);
-                    buf[numbytes] = '\0';
+//                    buf[numbytes] = '\0';
                     printf("Received: %s\n",buf);
                     if (strcmp(buf, "close") == 0)
                     {
                         cout << "这里要删除conn里一个连接" << endl;
-                    } else {
+                        for(int j =0;j<connFds.size();++j)
+                        {
+                            if (connFds[j].socketFd == it->socketFd)
+                            {
+                                cout << "hello555: " << j << endl;
+                                close(it->socketFd);
+                                FD_CLR(it->socketFd,&read_fds);
+                                it = connFds.erase(it);
+                            }
+                        }
+                        cout << "hello666: " << endl;
+                        for (int k =0;k<connFds.size();++k)
+                        {
+                            cout << connFds[k].socketFd << endl;
+                        }
+                        if (connFds.size() == 0)
+                        {
+                            break;
+                        }
+                    }
+/*                    else {
                         for(int i =0;i<connFds.size();++i)
                         {
                             if(connFds[i].socketFd != it->socketFd)
@@ -88,12 +106,11 @@ int selectPollServer() {
                             }
 
                         }
-                    }
+                    }*/
                 }
             }
             ++it;
         }
-
         for(vector<clientSocketFd>::iterator it = connFds.begin();it != connFds.end();++it)
         {
             if(FD_ISSET(it->socketFd, &exception_fds))
@@ -112,7 +129,6 @@ int selectPollServer() {
 
             }
         }
-
         if (FD_ISSET(sockfd, &read_fds))
         {
             if ((new_fd = ::accept(sockfd, (struct sockaddr *)&client_addr, &client_addr_len)) == -1)

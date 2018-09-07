@@ -14,23 +14,49 @@ using namespace std;
 int main() {
 
 #if 0
-//    serverTest();
-//    pollServer();
-    selectPollServer();
-
+    //    serverTest();
+    //    pollServer();
+        selectPollServer();
 #endif
 #if 1
 //   clientTest();
 //    selectPollClient();
-    char buf[1024]= "close";
+//    char buf[1024]= "close";
+//    if (strcmp(buf, "close") == 0)
+//    {
+//        cout << 2222<< endl;
+//    }
+//    cout << a << endl;
 
-    int a = strcmp(buf, "close");
-    cout << buf << endl;
+//    vector<int> list = {1};
+//    for (vector<int>::iterator it=list.begin();it != list.end();)
+//    {
+//        if (*it == 1)
+//        {
+//            it = list.erase(it);
+//            if (list.size()==0)
+//            {
+//                break;
+//            }
+//        }
+//        cout << *it << endl;
+//        ++it;
+//    }
+//
+//    for (int j =0;j<list.size();++j)
+//    {
+//        cout << list[j] << endl;
+//    }
+    char a[20];
+    cout << "请输入你要说的话: ";
+    cin.getline(a, 200);
+    cout << a <<endl;
 #endif
 #if 0
     InitChatWindow();
     input();
 #endif
+
 }
 #endif
 

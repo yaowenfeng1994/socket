@@ -27,6 +27,11 @@ struct clientSocketFd {
     string  userName;
 };
 
+//struct clientSendObj {
+//    string  userName;
+//    string  sendData;
+//};
+
 extern int selectPollServer();
 extern int selectPollClient();
 

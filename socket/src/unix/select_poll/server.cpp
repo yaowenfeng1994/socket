@@ -9,16 +9,18 @@ int selectPollServer() {
     struct sockaddr_in client_addr;
 
     int sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
-    int new_fd, numbytes;
-    unsigned int sin_size;
+    int new_fd;
+//    unsigned int sin_size;
+    bool erase_flag;
     int max_fd = sockfd;
     char buf[MAX_DATA_SIZE];
+    char name_buf[MAX_DATA_SIZE];
     vector<clientSocketFd> connFds;
 //    connFds.reserve(BACKLOG);
 
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(PORT);
-    server_addr.sin_addr.s_addr = inet_addr("192.168.0.102");
+    server_addr.sin_addr.s_addr = inet_addr("192.168.0.103");
     bzero(&(server_addr.sin_zero), 8);
 
     if (::bind(sockfd, (struct sockaddr *)&server_addr, sizeof(struct sockaddr))== -1) {
@@ -43,17 +45,25 @@ int selectPollServer() {
     while (true)
     {
         FD_SET(sockfd,&read_fds);
-        tv.tv_sec = 2;//这里我们打算让select等待两秒后返回，避免被锁死，也避免马上返回
+        tv.tv_sec = 2; // 这里我们打算让select等待两秒后返回，避免被锁死，也避免马上返回
         tv.tv_usec = 0;
-        for(int i =0;i<connFds.size();++i)
+
+        if (connFds.size() != 0)
         {
-            FD_SET(connFds[i].socketFd,&read_fds);
-            FD_SET(connFds[i].socketFd,&exception_fds);
-            cout << "当前连接池里有：" << connFds[i].socketFd << endl;
+            cout << "当前连接池里有：(";
+            for(int i =0;i<connFds.size();++i)
+            {
+                FD_SET(connFds[i].socketFd,&read_fds);
+                FD_SET(connFds[i].socketFd,&exception_fds);
+                cout << connFds[i].socketFd << ",";
+            }
+            cout << ")" << endl;
         }
-        select(max_fd+1, &read_fds, NULL, &exception_fds, &tv);
+
+        select(max_fd+1, &read_fds, nullptr, &exception_fds, &tv);
         for (vector<clientSocketFd>::iterator it=connFds.begin();it != connFds.end();)
         {
+            erase_flag = false;
             if (FD_ISSET(it->socketFd, &read_fds))
             {
                 bzero(buf,sizeof(buf));
@@ -66,8 +76,12 @@ int selectPollServer() {
                     continue;
                 } else {
                     sleep(1);
-//                    buf[numbytes] = '\0';
-                    printf("Received: %s\n",buf);
+                    strcpy(name_buf, it->userName.c_str());
+
+                    printf("%s say: %s\n",name_buf, buf);
+                    strcat(name_buf, " said:");
+                    strcat(name_buf, buf);
+
                     if (strcmp(buf, "close") == 0)
                     {
                         cout << "这里要删除conn里一个连接" << endl;
@@ -77,40 +91,41 @@ int selectPollServer() {
                             {
                                 cout << "hello555: " << j << endl;
                                 close(it->socketFd);
-                                FD_CLR(it->socketFd,&read_fds);
+                                FD_CLR(it->socketFd, &read_fds);
                                 it = connFds.erase(it);
+                                erase_flag = true;
                             }
                         }
-                        cout << "hello666: " << endl;
                         for (int k =0;k<connFds.size();++k)
                         {
                             cout << connFds[k].socketFd << endl;
                         }
                         if (connFds.size() == 0)
                         {
+                            cout << "当前连接池长度为0" << endl;
                             break;
                         }
                     }
-/*                    else {
-                        for(int i =0;i<connFds.size();++i)
+                    else {
+                        for (int l =0;l<connFds.size();++l)
                         {
-                            if(connFds[i].socketFd != it->socketFd)
+                            if(connFds[l].socketFd != it->socketFd)
                             {
-                                string str("some one said:");
-                                str.append(buf);
-                                int ret = send(it->socketFd,str.c_str(),str.length(),0);
-                                if(ret<=0)
+                                if (send(connFds[l].socketFd, name_buf, MAX_DATA_SIZE, 0) == -1)
                                 {
                                     perror("send");
                                 }
                             }
 
                         }
-                    }*/
+                    }
                 }
             }
-            ++it;
+            if (!erase_flag) {
+                ++it;
+            }
         }
+
         for(vector<clientSocketFd>::iterator it = connFds.begin();it != connFds.end();++it)
         {
             if(FD_ISSET(it->socketFd, &exception_fds))
@@ -136,27 +151,25 @@ int selectPollServer() {
                 perror("accept");
                 close(new_fd);
                 break;
+            } else {
+                if (recv(new_fd, buf, MAX_DATA_SIZE, 0) == -1)
+                {
+                    perror("recv");
+                } else {
+                    clientSocketFd fdObj;
+                    fdObj.socketFd = new_fd;
+                    fdObj.userName = buf;
+                    connFds.push_back(fdObj);
+                    max_fd = new_fd;
+                    // inet_ntoa(struct addr_in) 将IP地址转换为字符串并返回
+                    // 只是从监听队列中取出连接，即使客户端已经断开网络连接也会accept成功
+                    printf("server: got connection from %s:%d\n", inet_ntoa(client_addr.sin_addr), client_addr.sin_port);
+                }
             }
-            clientSocketFd fdObj;
-            fdObj.socketFd = new_fd;
-            connFds.push_back(fdObj);
-            max_fd = new_fd;
-            // inet_ntoa(struct addr_in) 将IP地址转换为字符串并返回
-            // 只是从监听队列中取出连接，即使客户端已经断开网络连接也会accept成功
-            printf("server: got connection from %s\n", inet_ntoa(client_addr.sin_addr));
-
-/*                if (0==fork()) {
-                    if ((numbytes=recv(new_fd, buf, MAXDATASIZE, 0)) == -1) {
-                        perror("recv");
-                        exit(1);
-                    }
-                    buf[numbytes] = '\0';
-                    printf("Received: %s",buf);
-                }*/
         }
         else
         {
-            cout << "还没有连接进来" << endl;
+            if (connFds.size() == 0) cout << "暂时还没有新的连接进来" << endl;
         }
     }
     return 0;

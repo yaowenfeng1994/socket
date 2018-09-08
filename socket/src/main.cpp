@@ -20,7 +20,7 @@ int main() {
 #endif
 #if 1
 //   clientTest();
-//    selectPollClient();
+    selectPollClient();
 //    char buf[1024]= "close";
 //    if (strcmp(buf, "close") == 0)
 //    {
@@ -47,10 +47,16 @@ int main() {
 //    {
 //        cout << list[j] << endl;
 //    }
-    char a[20];
-    cout << "请输入你要说的话: ";
-    cin.getline(a, 200);
-    cout << a <<endl;
+//    char a[20];
+//    cout << "请输入你要说的话: ";
+//    cin.getline(a, 200);
+//    cout << a <<endl;
+//    string user_name;
+//    cout << "请输入你在聊天室中的用户名: ";
+//    getline(cin, user_name);
+//    cout << user_name <<endl;
+//    strcpy(a, user_name.c_str());
+//    cout << a <<endl;
 #endif
 #if 0
     InitChatWindow();

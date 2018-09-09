@@ -16,7 +16,8 @@
 #include <sys/select.h>
 #include <sys/poll.h>
 
-#define PORT 8088
+//#define PORT 8088
+#define PORT 13389
 #define BACKLOG 2
 #define MAX_DATA_SIZE 512 /* 每次可以接收的最大字节 */
 
@@ -26,11 +27,6 @@ struct clientSocketFd {
     int     socketFd;
     string  userName;
 };
-
-//struct clientSendObj {
-//    string  userName;
-//    string  sendData;
-//};
 
 extern int selectPollServer();
 extern int selectPollClient();

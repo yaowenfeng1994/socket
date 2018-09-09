@@ -5,8 +5,8 @@
 
 int selectPollServer() {
     cout << "server" << endl;
-    struct sockaddr_in server_addr{};
-    struct sockaddr_in client_addr{};
+    struct sockaddr_in server_addr;
+    struct sockaddr_in client_addr;
 
     int sock_fd = ::socket(AF_INET, SOCK_STREAM, 0);
     int new_fd;
@@ -20,7 +20,8 @@ int selectPollServer() {
 
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(PORT);
-    server_addr.sin_addr.s_addr = inet_addr("192.168.0.103");
+//    server_addr.sin_addr.s_addr = inet_addr("192.168.0.103");
+    server_addr.sin_addr.s_addr = inet_addr("172.16.213.82");
     bzero(&(server_addr.sin_zero), 8);
 
     if (::bind(sock_fd, (struct sockaddr *)&server_addr, sizeof(struct sockaddr))== -1) {
@@ -40,7 +41,7 @@ int selectPollServer() {
     fd_set exception_fds;
     FD_ZERO(&read_fds);
     FD_ZERO(&exception_fds);
-    timeval tv{};
+    timeval tv;
 
     while (true)
     {

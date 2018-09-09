@@ -28,7 +28,9 @@ int main() {
 //    }
 //    cout << a << endl;
 
-//    vector<int> list = {1};
+//    vector<const char*> list;
+//    list = {"a", "b"};
+//    list = {"vv"};
 //    for (vector<int>::iterator it=list.begin();it != list.end();)
 //    {
 //        if (*it == 1)
@@ -45,7 +47,7 @@ int main() {
 //
 //    for (int j =0;j<list.size();++j)
 //    {
-//        cout << list[j] << endl;
+//        cout << "\n" << list[j];
 //    }
 //    char a[20];
 //    cout << "请输入你要说的话: ";

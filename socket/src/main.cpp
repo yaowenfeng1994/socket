@@ -13,9 +13,9 @@ int main() {
     //    pollServer();
         selectPollServer();
 #endif
-#if 1
+#if 0
 //   clientTest();
-//    selectPollClient();
+    selectPollClient();
 //    char buf[1024]= "close";
 //    if (strcmp(buf, "close") == 0)
 //    {

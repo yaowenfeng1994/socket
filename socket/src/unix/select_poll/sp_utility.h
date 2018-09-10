@@ -6,7 +6,9 @@
 #define SOCKET_SP_UTILITY_H
 #include <iostream>
 #include <vector>
-#include <string>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <sys/socket.h>
 #include <arpa/inet.h>

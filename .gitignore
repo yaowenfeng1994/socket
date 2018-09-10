@@ -4,5 +4,6 @@
 *.cmake
 
 socket/src/cmake-build-debug/
+socket/src/cmake-build-debug-linux/
 
 *.iml

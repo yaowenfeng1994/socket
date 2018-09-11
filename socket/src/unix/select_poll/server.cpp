@@ -61,7 +61,7 @@ int selectPollServer() {
             cout << ")" << endl;
         }
 
-        select(max_fd+1, &read_fds, nullptr, &exception_fds, &tv);
+        select(max_fd+1, &read_fds, NULL, &exception_fds, &tv);
         for (vector<clientSocketFd>::iterator it=connection_fds.begin();it != connection_fds.end();)
         {
             erase_flag = false;

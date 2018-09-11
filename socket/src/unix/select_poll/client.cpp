@@ -10,7 +10,7 @@ int selectPollClient() {
     struct sockaddr_in remote_addr{};
     string user_name;
     char buf[MAX_DATA_SIZE];
-    if ((he=gethostbyname("192.168.0.103")) == nullptr) { /* get the host info */
+    if ((he=gethostbyname("192.168.0.103")) == NULL) { /* get the host info */
         herror("gethostbyname");
         exit(1);
     }
@@ -38,7 +38,7 @@ int selectPollClient() {
     while (true) {
         FD_SET(remote_sockfd, &read_fds);
         FD_SET(0, &read_fds); //add stand input device
-        int ret = select(remote_sockfd + 1, &read_fds, nullptr, nullptr, nullptr);
+        int ret = select(remote_sockfd + 1, &read_fds, NULL, NULL, NULL);
         if (ret < 0) {
             perror("select");
             break;

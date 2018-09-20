@@ -10,7 +10,7 @@ int selectPollClient() {
     struct sockaddr_in remote_addr{};
     string user_name;
     char buf[MAX_DATA_SIZE];
-    if ((he=gethostbyname("192.168.0.103")) == NULL) { /* get the host info */
+    if ((he=gethostbyname("47.98.118.105")) == NULL) { /* get the host info */
         herror("gethostbyname");
         exit(1);
     }

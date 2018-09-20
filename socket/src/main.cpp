@@ -11,9 +11,10 @@ int main() {
 #if 1
     //    serverTest();
     //    pollServer();
-        selectPollServer();
+//        selectPollServer();
+//    cout << 123 <<endl;
 #endif
-#if 0
+#if 1
 //   clientTest();
     selectPollClient();
 //    char buf[1024]= "close";

@@ -3,6 +3,7 @@
 //
 #if 1
 #include "unix/select_poll/sp_utility.h"
+#include "unix/define.h"
 
 using namespace std;
 
@@ -11,7 +12,32 @@ int main() {
 #if 1
     //    serverTest();
     //    pollServer();
-        selectPollServer();
+    //    selectPollServer();
+
+
+    void stopsyn(int signo) {
+        printf("程序终止!\n");
+        close(rawsock);
+        exit(0);
+    }
+
+    if (argc != 4) {
+        printf("请输入伪造IP地址，目标IP地址，目标端口号！\n");
+        exit(1);
+    }
+    if (inet_aton(argv[1], &pesudo.sin_addr) == 0) {
+        printf("伪造IP地址不正确！\n");
+        exit(1);
+    }
+    if (inet_aton(argv[2], &target.sin_addr) == 0) {
+        printf("目的IP地址不正确！\n");
+        exit(1);
+    }
+    target.sin_port = htons(atoi(argv[3]));
+    /* 信号处理函数 */
+    signal(SIGINT, stopsyn);
+    syn();
+
 #endif
 #if 0
 //   clientTest();

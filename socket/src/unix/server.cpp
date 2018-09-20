@@ -2,8 +2,6 @@
 // Created by 姚文锋 on 2018/8/7.
 //
 #include "define.h"
-using namespace std;
-
 
 int serverTest() {
     cout << "server" << endl;
@@ -42,7 +40,7 @@ int serverTest() {
         }
         printf("server: got connection from %s\n", inet_ntoa(their_addr.sin_addr));
         if (0==fork()) {
-            if ((numbytes=recv(new_fd, buf, MAXDATASIZE, 0)) == -1) {
+            if ((numbytes=recv(new_fd, buf, MAX_DATA_SIZE, 0)) == -1) {
                 perror("recv");
                 exit(1);
             }

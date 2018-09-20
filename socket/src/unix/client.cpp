@@ -2,7 +2,6 @@
 // Created by 姚文锋 on 2018/8/7.
 //
 #include "define.h"
-using namespace std;
 
 int clientTest() {
     cout << "client" << endl;
@@ -30,7 +29,7 @@ int clientTest() {
     }
     if (send(sockfd, "Hello, i am client!\n", 100, 0) == -1)
         perror("send");
-    if ((numbytes=recv(sockfd, buf, MAXDATASIZE, 0)) == -1)
+    if ((numbytes=recv(sockfd, buf, MAX_DATA_SIZE, 0)) == -1)
     {
         perror("recv");
         exit(1);
